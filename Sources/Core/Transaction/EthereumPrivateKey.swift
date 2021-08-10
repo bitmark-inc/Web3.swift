@@ -8,7 +8,6 @@
 
 import Foundation
 import secp256k1
-import CryptoSwift
 
 public final class EthereumPrivateKey {
 
@@ -51,7 +50,7 @@ public final class EthereumPrivateKey {
         guard let bytes = Bytes.secureRandom(count: Int(rand)) else {
             throw Error.internalError
         }
-        let bytesHash = SHA3(variant: .keccak256).calculate(for: bytes)
+        let bytesHash = Data(bytes).sha3_keccak256.bytes
 
         try self.init(privateKey: bytesHash)
     }
@@ -213,7 +212,7 @@ public final class EthereumPrivateKey {
     // MARK: - Convenient functions
 
     public func sign(message: Bytes) throws -> (v: UInt, r: Bytes, s: Bytes) {
-        let hash = SHA3(variant: .keccak256).calculate(for: message)
+        let hash = Data(message).sha3_keccak256.bytes
         return try sign(hash: hash)
     }
 

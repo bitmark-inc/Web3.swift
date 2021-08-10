@@ -7,7 +7,6 @@
 //
 
 import Foundation
-import CryptoSwift
 
 public struct EthereumAddress {
 
@@ -75,7 +74,7 @@ public struct EthereumAddress {
         // EIP 55 checksum
         // See: https://github.com/ethereum/EIPs/blob/master/EIPS/eip-55.md
         if eip55 {
-            let hash = SHA3(variant: .keccak256).calculate(for: Array(hex.lowercased().utf8))
+            let hash = Data(Array(hex.lowercased().utf8)).sha3_keccak256.bytes
 
             for i in 0..<hex.count {
                 let charString = String(hex[hex.index(hex.startIndex, offsetBy: i)])
@@ -138,7 +137,7 @@ public struct EthereumAddress {
             for b in rawAddress {
                 address += String(format: "%02x", b)
             }
-            let hash = SHA3(variant: .keccak256).calculate(for: Array(address.utf8))
+            let hash = Data(Array(address.utf8)).sha3_keccak256
 
             for i in 0..<address.count {
                 let charString = String(address[address.index(address.startIndex, offsetBy: i)])

@@ -22,7 +22,7 @@ public extension ERC165Contract {
         let inputs = [SolidityFunctionParameter(name: "_interface", type: .bytes(length: 4))]
         let outputs = [SolidityFunctionParameter(name: "_supportsInterface", type: .bool)]
         let method = SolidityConstantFunction(name: "supportsInterface", inputs: inputs, outputs: outputs, handler: self)
-        let interfaceData = Data(hex: interface)
+        let interfaceData = Data(hexString: interface) ?? Data()
         return method.invoke(interfaceData)
     }
     

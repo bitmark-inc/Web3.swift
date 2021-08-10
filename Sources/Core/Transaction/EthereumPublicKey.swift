@@ -8,7 +8,6 @@
 
 import Foundation
 import secp256k1
-import CryptoSwift
 import BigInt
 
 public final class EthereumPublicKey {
@@ -84,7 +83,7 @@ public final class EthereumPublicKey {
         self.ctx = finalCtx
 
         // Generate associated ethereum address
-        var hash = SHA3(variant: .keccak256).calculate(for: publicKey)
+        var hash = Data(publicKey).sha3_keccak256.bytes
         guard hash.count == 32 else {
             throw Error.internalError
         }
@@ -172,7 +171,7 @@ public final class EthereumPublicKey {
         defer {
             free(pubkey)
         }
-        var hash = SHA3(variant: .keccak256).calculate(for: rawSig)
+        var hash = Data(rawSig).sha3_keccak256.bytes
         guard hash.count == 32 else {
             throw Error.internalError
         }
@@ -191,7 +190,7 @@ public final class EthereumPublicKey {
         self.rawPublicKey = rawPubKey
 
         // Generate associated ethereum address
-        var pubHash = SHA3(variant: .keccak256).calculate(for: rawPubKey)
+        var pubHash = Data(rawPubKey).sha3_keccak256.bytes
         guard pubHash.count == 32 else {
             throw Error.internalError
         }
