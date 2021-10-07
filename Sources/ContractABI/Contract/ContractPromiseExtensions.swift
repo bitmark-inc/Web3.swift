@@ -46,21 +46,4 @@ public extension SolidityConstructorInvocation {
     }
 }
 
-#if canImport(Web3PromiseKit)
-import Web3PromiseKit
-
-// MARK: - Promisable and Guaranteeable
-
-extension SolidityTuple: Guaranteeable {}
-extension SolidityWrappedValue: Guaranteeable {}
-extension ABIObject: Guaranteeable {}
-extension SolidityEmittedEvent: Guaranteeable {}
-extension SolidityEvent: Guaranteeable {}
-extension SolidityFunctionParameter: Guaranteeable {}
-extension SolidityReadInvocation: Guaranteeable {}
-extension SolidityPayableInvocation: Guaranteeable {}
-extension SolidityNonPayableInvocation: Guaranteeable {}
-extension SolidityConstructorInvocation: Guaranteeable {}
-#endif
-
 #endif

@@ -67,11 +67,6 @@ class SolidityWrappedValueTests: XCTestCase {
         XCTAssertEqual(SolidityWrappedValue.array(deepNestedArray).type, .array(type: .array(type: .array(type: .string, length: nil), length: nil), length: nil))
     }
     
-    func testAddress() {
-        let address = EthereumAddress.testAddress
-        XCTAssertEqual(SolidityWrappedValue.address(address).type, .address)
-    }
-    
     func testBool() {
         let bool = false
         XCTAssertEqual(SolidityWrappedValue.bool(bool).type, .bool)
