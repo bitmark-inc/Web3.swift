@@ -32,7 +32,7 @@ let package = Package(
         .target(
             name: "Web3",
             dependencies: [
-                .target(name: "tinysha3"),
+                .target(name: "keccak"),
                 .product(name: "BigInt", package: "BigInt"),
                 .product(name: "secp256k1", package: "secp256k1"),
             ],
@@ -42,15 +42,15 @@ let package = Package(
             name: "Web3ContractABI",
             dependencies: [
                 .target(name: "Web3"),
-                .target(name: "tinysha3"),
+                .target(name: "keccak"),
                 .product(name: "BigInt", package: "BigInt"),
             ],
             path: "Sources",
             sources: ["ContractABI"]),
         .target(
-            name: "tinysha3",
+            name: "keccak",
             dependencies: [],
-            path: "Sources/tinysha3",
+            path: "Sources/keccak",
             exclude: ["module.map"]),
         .testTarget(
             name: "Web3Tests",

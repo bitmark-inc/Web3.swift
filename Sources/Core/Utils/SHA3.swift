@@ -7,7 +7,7 @@
 //
 
 import Foundation
-import tinysha3
+import keccak
 
 public extension Data {
     var sha3_keccak256: Data {
