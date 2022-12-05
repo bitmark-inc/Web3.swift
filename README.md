@@ -1,10 +1,12 @@
-<a href="https://github.com/Boilertalk/Web3.swift">
-  <img src="https://bitcoinboomer-atm-app-releases.ams3.digitaloceanspaces.com/boilertalk.svg" width="100%" height="256">
-</a>
+<p align="center">
+  <a href="https://github.com/Boilertalk/Web3.swift">
+    <img src="https://crypto-bot-main.fra1.digitaloceanspaces.com/old/web3-swift-logo.png" width="256" height="256">
+  </a>
+</p>
 
 <p align="center">
-  <a href="https://travis-ci.org/Boilertalk/Web3.swift">
-    <img src="http://img.shields.io/travis/Boilertalk/Web3.swift.svg?style=flat" alt="CI Status">
+  <a href="https://github.com/Boilertalk/Web3.swift/actions/workflows/build-and-test.yml">
+    <img src="https://github.com/Boilertalk/Web3.swift/actions/workflows/build-and-test.yml/badge.svg?branch=master" alt="CI Status">
   </a>
   <a href="https://codecov.io/gh/Boilertalk/Web3.swift">
     <img src="https://codecov.io/gh/Boilertalk/Web3.swift/branch/master/graph/badge.svg" alt="Code Coverage">
@@ -14,12 +16,12 @@
   </a>
 </p>
 
-# :alembic: Web3
+# :chains: Web3
 
 Web3.swift is a Swift library for signing transactions and interacting with Smart Contracts in the Ethereum Network.
 
-It allows you to connect to a [geth](https://github.com/ethereum/go-ethereum) or [parity](https://github.com/paritytech/parity)
-Ethereum node (like [Infura](https://infura.io/)) to send transactions and read values from Smart Contracts without the need of
+It allows you to connect to a [geth](https://github.com/ethereum/go-ethereum) or [erigon](https://github.com/ledgerwatch/erigon)
+Ethereum node (like [Chainnodes](https://www.chainnodes.org/)) to send transactions and read values from Smart Contracts without the need of
 writing your own implementations of the protocols.
 
 Web3.swift supports iOS, macOS, tvOS, watchOS and Linux with Swift Package Manager.
@@ -81,7 +83,7 @@ Web3 is compatible with Swift Package Manager v5 (Swift 5 and above). Simply add
 
 ```Swift
 dependencies: [
-    .package(url: "https://github.com/Boilertalk/Web3.swift.git", from: "0.5.0")
+    .package(url: "https://github.com/Boilertalk/Web3.swift.git", from: "0.6.0")
 ]
 ```
 
@@ -92,9 +94,9 @@ targets: [
     .target(
         name: "MyProject",
         dependencies: [
-            .product(name: "Web3", package: "Web3"),
-            .product(name: "Web3PromiseKit", package: "Web3"),
-            .product(name: "Web3ContractABI", package: "Web3"),
+            .product(name: "Web3", package: "Web3.swift"),
+            .product(name: "Web3PromiseKit", package: "Web3.swift"),
+            .product(name: "Web3ContractABI", package: "Web3.swift"),
         ]
     ),
     .testTarget(
@@ -301,11 +303,11 @@ or [the official Ethereum JSON RPC documentation](https://eth.wiki/json-rpc/API)
 
 We are providing an optional module for interaction with smart contracts. To use it you have to add `Web3ContractABI` to your target dependencies in your Podfile (for SPM). Make sure you check out the [installation instructions](#Installation) first.
 
-We are providing two different options to create contract abi interfaces in Swift. Either you define your functions and events manually (or use one of our provided interfaces like [ERC20](Web3/Classes/ContractABI/Contract/ERC20.swift) or [ERC721](Web3/Classes/ContractABI/Contract/ERC721.swift)). Or you parse them from the JSON ABI representation just like in web3.js.
+We are providing two different options to create contract abi interfaces in Swift. Either you define your functions and events manually (or use one of our provided interfaces like [ERC20](Web3/Sources/ContractABI/Contract/ERC20.swift) or [ERC721](Web3/Sources/ContractABI/Contract/ERC721.swift)). Or you parse them from the JSON ABI representation just like in web3.js.
 
 ### Static Contracts
 
-Static contracts are classes implementing `StaticContract`. They provide a set of functions and events they want to use from the original smart contract. Check out our provided static contracts as a starting point ([ERC20](Web3/Classes/ContractABI/Contract/ERC20.swift) or [ERC721](Web3/Classes/ContractABI/Contract/ERC721.swift)).
+Static contracts are classes implementing `StaticContract`. They provide a set of functions and events they want to use from the original smart contract. Check out our provided static contracts as a starting point ([ERC20](Web3/Sources/ContractABI/Contract/ERC20.swift) or [ERC721](Web3/Sources/ContractABI/Contract/ERC721.swift)).
 
 Our static ERC20 interface is called `GenericERC20Contract`, the ERC721 contract is called `GenericERC721Contract`. Both can be subclassed to add more functions for custom contracts.
 
@@ -331,12 +333,16 @@ let myPrivateKey = try EthereumPrivateKey(hexPrivateKey: "...")
 firstly {
     web3.eth.getTransactionCount(address: myPrivateKey.address, block: .latest)
 }.then { nonce in
-    try contract.transfer(to: EthereumAddress(hex: "0x3edB3b95DDe29580FFC04b46A68a31dD46106a4a", eip55: true), value: 100000).createTransaction(
+    try contract.transfer(to: EthereumAddress(hex: "0x3edB3b95DDe29580FFC04b46A68a31dD46106a4a", eip55: true), value: 100000).createTransaction(        
         nonce: nonce,
+        gasPrice: EthereumQuantity(quantity: 21.gwei),
+        maxFeePerGas: nil,
+        maxPriorityFeePerGas: nil,
+        gasLimit: 100000,
         from: myPrivateKey.address,
         value: 0,
-        gas: 100000,
-        gasPrice: EthereumQuantity(quantity: 21.gwei)
+        accessList: [:],
+        transactionType: .legacy
     )!.sign(with: myPrivateKey).promise
 }.then { tx in
     web3.eth.sendRawTransaction(transaction: tx)
@@ -351,12 +357,16 @@ let myAddress = try EthereumAddress(hex: "0x1f04ef7263804fafb839f0d04e2b5a6a1a57
 firstly {
     web3.eth.getTransactionCount(address: myAddress, block: .latest)
 }.then { nonce in
-    try contract.transfer(to: EthereumAddress(hex: "0x3edB3b95DDe29580FFC04b46A68a31dD46106a4a", eip55: true), value: 100000).send(
+    try contract.transfer(to: EthereumAddress(hex: "0x3edB3b95DDe29580FFC04b46A68a31dD46106a4a", eip55: true), value: 100000).send(        
         nonce: nonce,
+        gasPrice: EthereumQuantity(quantity: 21.gwei),
+        maxFeePerGas: nil,
+        maxPriorityFeePerGas: nil,
+        gasLimit: 150000,
         from: myAddress,
         value: 0,
-        gas: 150000,
-        gasPrice: EthereumQuantity(quantity: 21.gwei)
+        accessList: [:],
+        transactionType: .legacy
     )
 }.done { txHash in
     print(txHash)
@@ -392,7 +402,17 @@ firstly {
 
 // Send some tokens to another address (locally signing the transaction)
 let myPrivateKey = try EthereumPrivateKey(hexPrivateKey: "...")
-guard let transaction = contract["transfer"]?(EthereumAddress.testAddress, BigUInt(100000)).createTransaction(nonce: 0, from: myPrivateKey.address, value: 0, gas: 150000, gasPrice: EthereumQuantity(quantity: 21.gwei)) else {
+guard let transaction = contract["transfer"]?(EthereumAddress.testAddress, BigUInt(100000)).createTransaction(
+    nonce: 0,
+    gasPrice: EthereumQuantity(quantity: 21.gwei),
+    maxFeePerGas: nil,
+    maxPriorityFeePerGas: nil,
+    gasLimit: 150000,
+    from: myPrivateKey.address,
+    value: 0,
+    accessList: [:],
+    transactionType: .legacy
+)) else {
     return
 }
 let signedTx = try transaction.sign(with: myPrivateKey)
@@ -408,7 +428,7 @@ firstly {
 
 Using this API you can interact with any smart contract in the Ethereum Network!
 
-For more examples, including contract creation (constructor calling) check out our [tests](Example/Tests/ContractTests).
+For more examples, including contract creation (constructor calling) check out our [tests](Tests/Web3Tests/ContractTests).
 
 ## Common errors
 
