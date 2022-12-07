@@ -3,7 +3,6 @@
 //  Web3
 //
 //  Created by Koray Koska on 08.03.18.
-//  Copyright © 2018 Boilertalk. All rights reserved.
 //
 
 import Foundation
@@ -170,12 +169,16 @@ public extension Web3.Eth {
 
     func sendRawTransaction(transaction: EthereumSignedTransaction) -> Promise<EthereumData> {
         return Promise { seal in
-            self.sendRawTransaction(transaction: transaction) { response in
-                response.sealPromise(seal: seal)
+            do {
+                try self.sendRawTransaction(transaction: transaction) { response in
+                    response.sealPromise(seal: seal)
+                }
+            } catch let err {
+                seal.reject(err)
             }
         }
     }
-    
+
     func sendTransaction(transaction: EthereumTransaction) -> Promise<EthereumData> {
         return Promise { seal in
             self.sendTransaction(transaction: transaction) { response in
@@ -274,6 +277,19 @@ public extension Web3.Eth {
     ) -> Promise<EthereumBlockObject?> {
         return Promise { seal in
             self.getUncleByBlockNumberAndIndex(block: block, uncleIndex: uncleIndex) { response in
+                response.sealPromise(seal: seal)
+            }
+        }
+    }
+
+    func getLogs(
+        addresses: [EthereumAddress]?,
+        topics: [[EthereumData]]?,
+        fromBlock: EthereumQuantityTag,
+        toBlock: EthereumQuantityTag
+    ) -> Promise<[EthereumLogObject]> {
+        return Promise { seal in
+            self.getLogs(addresses: addresses, topics: topics, fromBlock: fromBlock, toBlock: toBlock) { response in
                 response.sealPromise(seal: seal)
             }
         }

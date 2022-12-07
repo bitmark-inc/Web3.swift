@@ -8,7 +8,7 @@
 import Foundation
 import BigInt
 
-class ABIEncoder {
+public class ABIEncoder {
     
     enum Error: Swift.Error {
         case couldNotEncode(type: SolidityType, value: Any)
@@ -66,7 +66,7 @@ class ABIEncoder {
     public class func encode(_ values: SolidityWrappedValue...) throws -> String {
         return try encode(values)
     }
-    
+
     /// Encode a single wrapped value
     public class func encode(_ wrapped: SolidityWrappedValue) throws -> String {
         return try encode([wrapped])
